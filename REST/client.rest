@@ -26,8 +26,8 @@ PUT  http://localhost:3333/user/1fbb9380-a094-4503-a255-db7a2f98a561
 content-type: application/json
 
 {
-    "name": "Adrino Silva Santos",
-    "email":"adrino.s.santos@fema.com"
+    "name": "Lucas Eduardo Faleiro",
+    "email":"luxcafaleiro@gmail.com"
 }
 
 ###

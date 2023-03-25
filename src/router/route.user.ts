@@ -21,7 +21,7 @@ userRoute.get("/:id", (request, response) => {
   // console.log(result, " - ", typeof result);
 
   if (result === undefined)
-    response.status(400).json({ msg: "Usuário não encontrado!" });
+    response.status(400).json({ msg: "Usuário não foi encontrado!" });
 
   response.json(result);
 });
@@ -51,7 +51,7 @@ userRoute.delete("/:id", (request, response) => {
   // console.log(result, " - ", typeof result);
 
   if (userExist === undefined)
-    return response.status(400).json({ msg: "Usuário não encontrado!" });
+    return response.status(400).json({ msg: "Usuário não foi encontrado!" });
 
   database.delete(table, id);
 
@@ -66,7 +66,7 @@ userRoute.put("/:id", (request, response) => {
 
   const userExist: any = database.select(table, id);
   if (userExist === undefined)
-    return response.status(400).json({ msg: "Usuário não encontrado!" });
+    return response.status(400).json({ msg: "Usuário não foi encontrado!" });
 
   database.update(table, id, { name, email });
 
