@@ -1,9 +1,22 @@
 import fs from "node:fs/promises";
 
+interface IDatabase {
+
+  "id": string,
+  "name": string,
+  "saldo": number,
+  "transicao": [
+    {
+    "tipo": string,
+    "valor": number
+  }]
+
+}
+
 const databasePath = new URL("../db.json", import.meta.url);
 
 export class Database {
-  #database: any = {};
+  #database: IDatabase [][] = [];
 
   constructor() {
     fs.readFile(databasePath, "utf8")
@@ -15,54 +28,56 @@ export class Database {
       });
   }
 
-  #persist() {
-    fs.writeFile(databasePath, JSON.stringify(this.#database, null, 2));
+  #persist(){
+
+    fs.writeFile(databasePath, JSON.stringify(this.#database, null, 2))
   }
 
-  select(table: string, id?: string): object {
-    let data = this.#database[table] ?? [];
+  select(table: any, id?: string): IDatabase[] {
+    let data = this.#database[table] ?? []
 
-    if (id) {
-      data = data.find((row: any) => {
-        return row.id === id;
-      });
-    }
+    if(id){data= data.find((row:any) => {
+      return row.id === id;
+    })};
 
-    return data;
+    return data
   }
 
-  insert(table: string, data: object): object {
-    if (Array.isArray(this.#database[table])) {
-      // Se sim entra aqui
+  insert(table: any, data:IDatabase): IDatabase {
+
+    if(Array.isArray(this.#database[table])) {
+
       this.#database[table].push(data);
       this.#persist();
     } else {
-      // Se não entra aqui
-      this.#database[table] = [data];
+
+      this.#database[table] = [data]
     }
 
-    return data;
+    return data
   }
 
-  delete(table: string, id: string) {
-    const rowIndex = this.#database[table].findIndex(
-      (row: any) => row.id === id
-    );
 
-    if (rowIndex > -1) {
-      this.#database[table].splice(rowIndex, 1);
+  delete(table:any, id:string): void{
+
+    const rowIndex  = this.#database[table].findIndex((row:any) => row.id === id)
+
+
+    if(rowIndex > -1){
+      this.#database[table].slice(rowIndex, 1);
       this.#persist();
+
     }
   }
 
-  update(table: string, id: string, data: object) {
-    const rowIndex = this.#database[table].findIndex(
-      (row: any) => row.id === id
-    );
+  update(table:any, id:string, data:IDatabase): void{
 
-    if (rowIndex > -1) {
-      this.#database[table][rowIndex] = { id, ...data };
-      this.#persist();
+    const rowIndex = this.#database[table].findIndex((row:any)=> row.id === id);
+
+    if(rowIndex > -1) {
+      this.#database[table][rowIndex] = data
+      this.#persist()
     }
+
   }
 }

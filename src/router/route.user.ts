@@ -8,148 +8,105 @@ const database = new Database();
 
 const table = "user";
 
+//Request - parâmetro que vem de Cliente
+//Response - parâmetro que vem de Cliente
 userRoute.get("/", (request, response) => {
   const user = database.select(table);
   response.json(user);
 });
 
-userRoute.get("/:id", (request, response) => {
-  const { id } = request.params;
+//Adicionar Usuário
+userRoute.get("/", (request, response) => {
+  const { name, saldo, transicao } = request.body;
 
-  const result = database.select(table, id);
+  const user = {
+    id:randomUUID(),
+    name,
+    saldo,
+    transicao
+  };
 
   // console.log(result, " - ", typeof result);
 
-  if (result === undefined)
-    response.status(400).json({ msg: "Usuário não foi encontrado!" });
-
-  response.json(result);
+    database.insert(table, user);
+    response.status(201).send({msg:'OK!'})
 });
 
 // Parâmetro que esta vindo do CLIENTE - REQUEST
 // Parâmetro que esta indo para o CLIENTE - RESPONSE
 
-userRoute.post("/", (request, response) => {
-  const { name, email } = request.body;
+//Deletar por ID
+userRoute.delete('/:id', (request, response) => {
+  const {id} = request.params
 
-  const user = {
-    id: randomUUID(),
-    name: name,
-    email,
-  };
+  const userExist:any = database.select(table, id);
 
-  database.insert(table, user);
+  if(userExist === undefined)
+  return response.status(400).json(
+    {msg:'Usuário não encontrado!'});
 
-  response.status(201).json({ msg: "sucesso!" });
+    database.delete(table, id)
+
+    response.status(202).json(
+      {msg: `Usuário ${userExist.name} deletado!` });
+
+  //database.select(table, id)
 });
 
-userRoute.delete("/:id", (request, response) => {
-  const { id } = request.params;
+//metodo de editar o user
+userRoute.put('/:id', (request,response)=>{
 
-  const userExist: any = database.select(table, id);
+  const {id} = request.params
+  const {name, saldo, transicao} = request.body
 
-  // console.log(result, " - ", typeof result);
+  const userExist:any = database.select(table, id);
 
-  if (userExist === undefined)
-    return response.status(400).json({ msg: "Usuário não foi encontrado!" });
+  if(userExist === undefined)
+  return response.status(400).json(
+    {msg:'Usuário não encontrado!'});
 
-  database.delete(table, id);
+    database.update(table, id, {id, name, saldo, transicao})
 
-  response
-    .status(202)
-    .json({ msg: `Usuário ${userExist.name} foi deletado do banco` });
-});
+    response.status(201).json(
+      {msg: `Usuário ${userExist.name} foi atualizado!` });
 
-userRoute.put("/:id", (request, response) => {
-  const { id } = request.params;
-  const { name, email } = request.body;
+})
 
-  const userExist: any = database.select(table, id);
-  if (userExist === undefined)
-    return response.status(400).json({ msg: "Usuário não foi encontrado!" });
+//metodo de retirada pelo ID
+userRoute.put('/retirada/:id', (request,response)=>{
 
-  database.update(table, id, { name, email });
+  const {id} = request.params
+  const {name, saldo, transicao: [{ tipo, valor}]} = request.body
 
-  response.status(201).json({ msg: `O ID: {${id}} foi alterado banco` });
-});
+  const userExist:any = database.select(table, id);
 
+  if(userExist === undefined)
+  return response.status(400).json(
+    {msg:'Usuário não encontrado!'});
 
-const router = Router();
+    database.update(table, id, {id, name, saldo: saldo - valor, transicao: [{ tipo, valor}]})
 
-let users = [
-  {
-    id: 1,
-    nome: 'usuario1',
-    email: 'usuario1@gmail.com',
-    valor: 100.0
-  },
-  {
-    id: 2,
-    nome: 'usuario2',
-    email: 'usuario2@gmail.com',
-    valor: 200.0
-  }
-];
+    response.status(201).json(
+      {msg: ` Foi retirado  ${userExist.valor} Reais!` });
 
-router.get('/users', (req, res) => {
-  res.json(users);
-});
+})
 
-userRoute.get('/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) {
-    return res.status(404).json({ message: 'Usuário não encontrado!' });
-  }
-  res.json(user);
-});
+//metodo de deposito pelo ID
+userRoute.put('/deposito/:id', (request,response)=>{
 
-userRoute.post('/users', (req, res) => {
-  const { nome, email, valor } = req.body;
-  const id = users.length + 1;
-  const user = { id, nome, email, valor };
-  users.push(user);
-  res.json(user);
-});
+  const {id} = request.params
+  const {name, saldo, transicao: [{ tipo, valor}]} = request.body
 
-userRoute.put('/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) {
-    return res.status(404).json({ message: 'Usuário não encontrado!' });
-  }
-  const { nome, email, valor } = req.body;
-  user.nome = nome;
-  user.email = email;
-  user.valor = valor;
-  res.json(user);
-});
+  const userExist:any = database.select(table, id);
 
-userRoute.delete('/users/:id', (req, res) => {
-  users = users.filter(u => u.id !== parseInt(req.params.id));
-  res.json({ message: 'User deleted' });
-});
+  if(userExist === undefined)
+  return response.status(400).json(
+    {msg:'Usuário não encontrado'});
 
-userRoute.post('/users/:id/deposit', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) {
-    return res.status(404).json({ message: 'Usuário não encontrado!' });
-  }
-  const { amount } = req.body;
-  user.valor += amount;
-  res.json(user);
-});
+    database.update(table, id, {id, name, saldo: saldo + valor, transicao: [{ tipo, valor}]})
 
-userRoute.post('/users/:id/withdraw', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) {
-    return res.status(404).json({ message: 'Usuário não encontrado!' });
-  }
-  const { amount } = req.body;
-  if (user.valor < amount) {
-    return res.status(400).json({ message: 'Valor insuficiente' });
-  }
-  user.valor -= amount;
-  res.json(user);
-});
+    response.status(201).json(
+      {msg: ` Foi depositado o valor de  ${userExist.valor}` });
 
-export { userRoute };
-
+})
+export {userRoute}

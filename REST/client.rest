@@ -1,34 +1,72 @@
-### Buscar todos os IDs
+### Buscar todos os IDs.
+
 GET http://localhost:3333/user/
 
-### Buscar ID especifico
-GET http://localhost:3333/user/49a368e5-7322-4549-88f0-31f0415e57c5
 
-### Buscar ID especifico
-GET http://localhost:3333/user/49a368e5-7322-4549-88f0-31f0415e5
+### Buscar extrato pelo ID.
 
-### Inserir Informação no banco
-POST http://localhost:3333user/
+GET http://localhost:3333/user/82a03a9e-fb73-4450-b4b6-171fb2717ed1
+
+
+### Adicionar Usuário.
+
+POST http://localhost:3333/user/
 content-type: application/json
 
 {
-    "name": "FEMA 2",
-    "curso": "Tecnico em Informatica",
-    "email":"fema@fema.com",
-    "uc":"Programação WEB 3"
+    "name": "Tiago",
+    "saldo": 0,
+    "transicao": [{}]
 }
 
-### Deletar um usuario pelo ID no banco
-DELETE  http://localhost:3333/user/f5d0ead8-5215-4461-930d-6147478bcb0b
 
-### Atualizar um usuario pelo ID no Banco
-PUT  http://localhost:3333/user/1fbb9380-a094-4503-a255-db7a2f98a561
+### Adicionar Deposito.
+
+PUT  http://localhost:3333/user/deposito/943de695-889f-4deb-8f60-0013347ce1a5
 content-type: application/json
 
 {
-    "name": "Lucas Eduardo Faleiro",
-    "email":"luxcafaleiro@gmail.com"
+    "name": "Tiago",
+    "saldo": 0,
+    "transicao": [{
+      "tipo": "deposito",
+      "valor": 100
+    }]
 }
 
-###
+
+### Adicionar Retirada.
+
+PUT  http://localhost:3333/user/retirada/943de695-889f-4deb-8f60-0013347ce1a5
+content-type: application/json
+
+{
+    "name": "Tiago",
+    "saldo": 100,
+    "transicao": [{
+      "tipo": "retirada",
+      "valor": 100
+    }]
+}
+
+
+### Deletar Usuário.
+
+delete http://localhost:3333/user/943de695-889f-4deb-8f60-0013347ce1a5
+
+
+### Atualizar um usuario pelo ID.
+
+PUT  http://localhost:3333/user/943de695-889f-4deb-8f60-0013347ce1a5
+content-type: application/json
+
+{
+    "name": "Tiago",
+    "saldo": 100,
+    "transicao": [{}]
+}
+
+
+### Buscar IDs pela rota USER.
+
 GET http://localhost:3333/user/
