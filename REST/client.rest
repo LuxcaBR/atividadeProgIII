@@ -1,4 +1,4 @@
-### Buscar todo os ID
+### Buscar todos os IDs
 GET http://localhost:3333/user/
 
 ### Buscar ID especifico
