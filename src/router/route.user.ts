@@ -10,20 +10,30 @@ const table = "user";
 
 //Request - parâmetro que vem de Cliente
 //Response - parâmetro que vem de Cliente
-userRoute.get("/", (request, response) => {
+userRoute.get('/', (request, response) => {
   const user = database.select(table);
   response.json(user);
 });
 
+userRoute.get('/:id', (request, response) => {
+  const {id} = request.params
+
+ const result = database.select(table, id);
+
+ if(result === undefined) response.status(400).json({msg:'Usuário não encontrado'})
+
+  response.json(result)
+})
+
 //Adicionar Usuário
-userRoute.get("/", (request, response) => {
-  const { name, saldo, transicao } = request.body;
+userRoute.post('/', (request, response) => {
+  const { nome, saldo, transferencia } = request.body;
 
   const user = {
     id:randomUUID(),
-    name,
+    nome,
     saldo,
-    transicao
+    transferencia
   };
 
   // console.log(result, " - ", typeof result);
@@ -37,6 +47,7 @@ userRoute.get("/", (request, response) => {
 
 //Deletar por ID
 userRoute.delete('/:id', (request, response) => {
+
   const {id} = request.params
 
   const userExist:any = database.select(table, id);
@@ -48,16 +59,16 @@ userRoute.delete('/:id', (request, response) => {
     database.delete(table, id)
 
     response.status(202).json(
-      {msg: `Usuário ${userExist.name} deletado!` });
+      {msg: `Usuário ${userExist.nome} deletado!` });
 
   //database.select(table, id)
 });
 
-//metodo de editar o user
+//Alterar o Usuário.
 userRoute.put('/:id', (request,response)=>{
 
   const {id} = request.params
-  const {name, saldo, transicao} = request.body
+  const {nome, saldo, transferencia} = request.body
 
   const userExist:any = database.select(table, id);
 
@@ -65,18 +76,18 @@ userRoute.put('/:id', (request,response)=>{
   return response.status(400).json(
     {msg:'Usuário não encontrado!'});
 
-    database.update(table, id, {id, name, saldo, transicao})
+    database.update(table, id, {id, nome, saldo, transferencia})
 
     response.status(201).json(
-      {msg: `Usuário ${userExist.name} foi atualizado!` });
+      {msg: `Usuário ${userExist.nome} foi atualizado!` });
 
 })
 
-//metodo de retirada pelo ID
+//Saque por ID.
 userRoute.put('/retirada/:id', (request,response)=>{
 
   const {id} = request.params
-  const {name, saldo, transicao: [{ tipo, valor}]} = request.body
+  const {nome, transferencia: [{ tipo, valor}]} = request.body
 
   const userExist:any = database.select(table, id);
 
@@ -84,18 +95,23 @@ userRoute.put('/retirada/:id', (request,response)=>{
   return response.status(400).json(
     {msg:'Usuário não encontrado!'});
 
-    database.update(table, id, {id, name, saldo: saldo - valor, transicao: [{ tipo, valor}]})
+        let transferencia = userExist.transferencia
+        transferencia.push({tipo, valor})
+        console.log(transferencia)
+        let saldo = userExist.saldo
+        database.update(table, id, {id, nome, saldo: saldo - valor, transferencia})
 
-    response.status(201).json(
-      {msg: ` Foi retirado  ${userExist.valor} Reais!` });
-
+        response.status(201).json(
+          {msg: ` Foi sacado o valor de  ${valor}` });
 })
 
-//metodo de deposito pelo ID
+
+
+//Deposito pelo ID
 userRoute.put('/deposito/:id', (request,response)=>{
 
   const {id} = request.params
-  const {name, saldo, transicao: [{ tipo, valor}]} = request.body
+  const {nome, transferencia: [{ tipo, valor}]} = request.body
 
   const userExist:any = database.select(table, id);
 
@@ -103,10 +119,14 @@ userRoute.put('/deposito/:id', (request,response)=>{
   return response.status(400).json(
     {msg:'Usuário não encontrado'});
 
-    database.update(table, id, {id, name, saldo: saldo + valor, transicao: [{ tipo, valor}]})
+    let transferencia = userExist.transferencia
+    transferencia.push({tipo, valor})
+    console.log(transferencia)
+    let saldo = userExist.saldo
+    database.update(table, id, {id, nome, saldo: saldo + valor, transferencia})
 
     response.status(201).json(
-      {msg: ` Foi depositado o valor de  ${userExist.valor}` });
+      {msg: ` Foi depositado o valor de  ${valor}` });
 
 })
 export {userRoute}

@@ -1,22 +1,10 @@
 import fs from "node:fs/promises";
 
-interface IDatabase {
-
-  "id": string,
-  "name": string,
-  "saldo": number,
-  "transicao": [
-    {
-    "tipo": string,
-    "valor": number
-  }]
-
-}
-
 const databasePath = new URL("../db.json", import.meta.url);
 
 export class Database {
-  #database: IDatabase [][] = [];
+  #database: any = [];
+
 
   constructor() {
     fs.readFile(databasePath, "utf8")
@@ -24,7 +12,7 @@ export class Database {
         this.#database = JSON.parse(data);
       })
       .catch(() => {
-        this.#persist();
+        fs.writeFile(databasePath, JSON.stringify({}, null, 2))
       });
   }
 
@@ -33,7 +21,7 @@ export class Database {
     fs.writeFile(databasePath, JSON.stringify(this.#database, null, 2))
   }
 
-  select(table: any, id?: string): IDatabase[] {
+  select(table: any, id?: string): object[] {
     let data = this.#database[table] ?? []
 
     if(id){data= data.find((row:any) => {
@@ -43,7 +31,7 @@ export class Database {
     return data
   }
 
-  insert(table: any, data:IDatabase): IDatabase {
+  insert(table: any, data:object): object {
 
     if(Array.isArray(this.#database[table])) {
 
@@ -70,7 +58,7 @@ export class Database {
     }
   }
 
-  update(table:any, id:string, data:IDatabase): void{
+  update(table:any, id:string, data:object): void{
 
     const rowIndex = this.#database[table].findIndex((row:any)=> row.id === id);
 

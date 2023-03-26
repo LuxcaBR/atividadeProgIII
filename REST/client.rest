@@ -8,32 +8,30 @@ GET http://localhost:3333
 GET http://localhost:3333/user/
 
 
-### Buscar extrato pelo ID.
+### Buscar extrato e saldo pelo ID.
 
-GET http://localhost:3333/user/82a03a9e-fb73-4450-b4b6-171fb2717ed1
-
+GET http://localhost:3333/user/a9230377-29ce-4002-9cd8-c4c7d30f9c3a
 
 ### Adicionar Usuário.
-
 POST http://localhost:3333/user/
 content-type: application/json
 
 {
-    "name": "Tiago",
+    "nome": "Tiago",
     "saldo": 0,
-    "transicao": [{}]
+    "transferencia": [{}]
 }
 
 
 ### Adicionar Deposito.
 
-PUT  http://localhost:3333/user/deposito/943de695-889f-4deb-8f60-0013347ce1a5
+PUT  http://localhost:3333/user/deposito/a9230377-29ce-4002-9cd8-c4c7d30f9c3a
 content-type: application/json
 
 {
-    "name": "Tiago",
+    "nome": "Tiago",
     "saldo": 0,
-    "transicao": [{
+    "transferencia": [{
       "tipo": "deposito",
       "valor": 100
     }]
@@ -42,36 +40,31 @@ content-type: application/json
 
 ### Adicionar Retirada.
 
-PUT  http://localhost:3333/user/retirada/943de695-889f-4deb-8f60-0013347ce1a5
+PUT  http://localhost:3333/user/retirada/a9230377-29ce-4002-9cd8-c4c7d30f9c3a
 content-type: application/json
 
 {
-    "name": "Tiago",
+    "nome": "Tiago",
     "saldo": 100,
-    "transicao": [{
+    "transferencia": [{
       "tipo": "retirada",
       "valor": 100
     }]
 }
 
 
+
 ### Deletar Usuário.
 
-delete http://localhost:3333/user/943de695-889f-4deb-8f60-0013347ce1a5
-
+delete http://localhost:3333/user/a9230377-29ce-4002-9cd8-c4c7d30f9c3a
 
 ### Atualizar um usuario pelo ID.
 
-PUT  http://localhost:3333/user/943de695-889f-4deb-8f60-0013347ce1a5
+PUT  http://localhost:3333/user/a9230377-29ce-4002-9cd8-c4c7d30f9c3a
 content-type: application/json
 
 {
-    "name": "Tiago",
+    "nome": "Tiago",
     "saldo": 100,
-    "transicao": [{}]
+    "transferencia": [{}]
 }
-
-
-### Buscar IDs pela rota USER.
-
-GET http://localhost:3333/user/
